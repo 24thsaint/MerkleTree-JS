@@ -30,7 +30,6 @@ class MerkleTree {
      */
     generateTree() {
         let leavesCopy = Array.from(this.nodes)
-        let lonelyLeaf
 
         this.layers.push(leavesCopy)
         let targetLayerNumber = Math.ceil(this.nodes.length / 2) + 1
