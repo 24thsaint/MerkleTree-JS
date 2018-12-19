@@ -10,7 +10,7 @@ class MerkleTree {
     /**
      * Tree generation.
      * 
-     * Examples:
+     * @example
      * 
      *     [5]
      *   [4] [3]
@@ -63,6 +63,12 @@ class MerkleTree {
         return this.layers
     }
 
+    /**
+     * Retrieves the proof, an array of hashes with position information, 
+     * necessary to verify a given single data.
+     * 
+     * @param {string} rawData 
+     */
     getProof(rawData) {
         const proof = []
         const data = new Node(rawData)
@@ -84,9 +90,9 @@ class MerkleTree {
         }
 
         /**
-         * Handle proof path by finding the sibling.
+         * Get proof path by finding the siblings.
          * 
-         * Positioning data is important so that when we verify the proof,
+         * Position information is important so that when we verify the proof,
          * we'll know whether the proof hash should come
          * before or after during concatenation.
          * 
@@ -101,6 +107,10 @@ class MerkleTree {
             const layer = this.layers[index];
             const position = positionIndex % 2 === 0 ? 'left' : 'right'
 
+            /**
+             * If the position of this node is on the left,
+             * the sibling is on the right, and vice-versa.
+             */
             if (position === 'left') {
                 hashPositionIndicator = 'right'
                 sibling = positionIndex + 1
@@ -113,7 +123,28 @@ class MerkleTree {
                 hashPositionIndicator,
                 sibling: layer[sibling]
             })
-
+            
+            /**
+             * Move one layer up.
+             * 
+             * Example:
+             * 
+             * [1] [2] [3] [4]
+             * 
+             * Chosen element is [3] at index [2]
+             * nextPositionIndex = currentPositionIndex / 2
+             *                   = [2] / 2
+             * nextPositionIndex = [1]
+             * 
+             * Adding the next layer:
+             * 
+             *   [5]     [6]
+             * [1] [2] [3] [4]
+             * 
+             * nextPositionIndex = [1], entry: [6]
+             * 
+             * And so on...
+             */
             positionIndex = (positionIndex / 2)
 
             if (!Number.isInteger(positionIndex)) {
@@ -132,7 +163,7 @@ class MerkleTree {
     }
 
     /**
-     * Fancy printing stuff
+     * Fancy console printing stuff.
      */
     print() {
         for (let iterator = this.layers.length - 1; iterator >= 0; iterator--) {
@@ -145,6 +176,32 @@ class MerkleTree {
         }
     }
 
+    /**
+     * Verify that the given raw data and supplied proof
+     * will lead to the same merkle root.
+     * 
+     * @example
+     * 
+     *           [  i  ]
+     *     [  h  ]     [e]
+     *   [f]     [g]   [e] 
+     * [a] [b] [c] [d] [e]
+     *
+     * If we are going to verify the existence of entry [c],
+     * we will only need the following data (c,d,f,e):
+     * 
+     *           [  x  ]
+     *     [  x  ]     [e]
+     *   [f]     [x]   [ ] 
+     * [ ] [ ] [c] [d] [ ]
+     * 
+     * From this, we can derive entries marked as [x] given
+     * the sibling data from the previous layers.
+     *  
+     * @param {string} rawData 
+     * @param {Array<Object>} proof 
+     * @param {string} merkleRoot 
+     */
     verify(rawData, proof, merkleRoot) {
         let data = new Node(rawData)
 
