@@ -75,6 +75,7 @@ class MerkleTree {
             const element = this.nodes[index];
             if (element.hash.toString('hex') === data.hash.toString('hex')) {
                 positionIndex = index
+                break
             }
         }
 
