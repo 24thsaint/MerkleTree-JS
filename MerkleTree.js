@@ -18,7 +18,7 @@ class MerkleTree {
      * 
      * Node length: 3
      * Target layer number: Math.ceiling(3 / 2) + 1 = 3
-     * Node at index 2 is a leaf so it'll get carried over until (targetLayerNumber - 1)
+     * Node at index 2 is a lonely leaf so it will get carried over until (targetLayerNumber - 1)
      * 
      *     [  7  ]
      *   [5]     [6]
